@@ -1,0 +1,82 @@
+version: '3.8'
+services:
+  postgres_vivopos:
+    image: postgres:latest
+    container_name: postgres_vivopos
+    environment:
+      POSTGRES_USER: replication_debezium
+      POSTGRES_PASSWORD: vivo123
+      POSTGRES_DB: vivo_pos
+    volumes:
+      - pos_data:/var/lib/postgresql/data
+      - ./db/vivopos:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+    networks:
+      - vivo_network
+
+  postgres_vivofibra:
+    image: postgres:latest
+    container_name: postgres_vivofibra
+    environment:
+      POSTGRES_USER: replication_debezium
+      POSTGRES_PASSWORD: vivo123
+      POSTGRES_DB: vivo_fibra
+    volumes:
+      - fibra_data:/var/lib/postgresql/data
+      - ./db/vivofibra:/docker-entrypoint-initdb.d
+    ports:
+      - "5434:5432"
+    networks:
+      - vivo_network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - vivo_network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - vivo_network
+
+  debezium:
+    image: debezium/connect:latest
+    ports:
+      - "8083:8083"
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+      - KEY_CONVERTER_SCHEMAS_ENABLE=false
+      - VALUE_CONVERTER_SCHEMAS_ENABLE=false
+    depends_on:
+      - kafka
+      - postgres_vivofibra
+      - postgres_vivopos
+    networks:
+      - vivo_network
+      
+volumes:
+  pos_data:
+  fibra_data:
+
+networks:
+  vivo_network:
+      driver: bridge
+      name: vivo_network

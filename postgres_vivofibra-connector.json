@@ -1,0 +1,24 @@
+{
+  "name": "postgresql-connector-vivofibra",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "postgres_vivofibra",
+    "database.port": "5432",
+    "database.user": "replication_debezium",
+    "database.password": "vivo123",
+    "database.dbname": "vivo_fibra",
+    "database.server.name": "vivofibra",
+    "slot.name": "debezium_slot_vivofibra",
+    "publication.name": "debezium_publication_vivofibra",
+    "plugin.name": "pgoutput",
+    "topic.prefix": "VIVOFIBRA",
+    "heartbeat.interval.ms": "1000",
+    "snapshot.mode": "initial",
+    "max.batch.size": "2048",
+    "max.queue.size": "8192",
+    "poll.interval.ms": "500",
+    "errors.retry.timeout": "-1",
+    "tombstones.on.delete": "false",
+    "table.include.list": "public.clientes,public.assinaturas,public.equipamentos,public.pagamentos,public.faturas,public.servicos_adicionais"
+  }
+}
