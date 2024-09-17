@@ -4,9 +4,9 @@ services:
     image: postgres:latest
     container_name: postgres_vivopos
     environment:
-      POSTGRES_USER: replication_debezium
-      POSTGRES_PASSWORD: vivo123
-      POSTGRES_DB: vivo_pos
+      POSTGRES_USER: ${POSTGRES_VIVOPOS_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_VIVOPOS_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_VIVOPOS_DBNAME}
     volumes:
       - pos_data:/var/lib/postgresql/data
       - ./db/vivopos:/docker-entrypoint-initdb.d
@@ -19,9 +19,9 @@ services:
     image: postgres:latest
     container_name: postgres_vivofibra
     environment:
-      POSTGRES_USER: replication_debezium
-      POSTGRES_PASSWORD: vivo123
-      POSTGRES_DB: vivo_fibra
+      POSTGRES_USER: ${POSTGRES_VIVOFIBRA_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_VIVOFIBRA_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_VIVOFIBRA_DBNAME}
     volumes:
       - fibra_data:/var/lib/postgresql/data
       - ./db/vivofibra:/docker-entrypoint-initdb.d

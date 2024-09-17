@@ -1,13 +1,13 @@
 DO
 $do$
 BEGIN
-   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'replication_debezium') THEN
-      CREATE ROLE replication_debezium WITH REPLICATION LOGIN PASSWORD 'vivo123';
+   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '${POSTGRES_VIVOPOS_USER}') THEN
+      CREATE ROLE ${POSTGRES_VIVOPOS_USER} WITH REPLICATION LOGIN PASSWORD '${POSTGRES_VIVOPOS_PASSWORD}';
    END IF;
 END
 $do$;
 
-GRANT CONNECT ON DATABASE vivo_fibra TO replication_debezium;
+GRANT CONNECT ON DATABASE ${POSTGRES_VIVOPOS_DBNAME} TO ${POSTGRES_VIVOPOS_USER};
 
 -- Armazena as informações dos clientes que assinam o serviço pós-pago.
 CREATE TABLE clientes (
@@ -72,8 +72,7 @@ CREATE TABLE servicos_adicionais (
     data_fim TIMESTAMP
 );
 
+SELECT * FROM pg_create_logical_replication_slot('${POSTGRES_VIVOPOS_SLOT_NAME}', '${POSTGRES_VIVOPOS_PLUGIN_NAME}');
 
-SELECT * FROM pg_create_logical_replication_slot('debezium_slot_vivopos', 'pgoutput');
-
-CREATE PUBLICATION debezium_publication_vivopos
+CREATE PUBLICATION ${POSTGRES_VIVOPOS_PUBLICATION_NAME}
 FOR TABLE public.clientes, public.linhas_moveis, public.pacotes_dados, public.pagamentos, public.faturas, public.servicos_adicionais;
